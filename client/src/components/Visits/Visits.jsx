@@ -72,6 +72,18 @@ function App() {
               </label>
             </fieldset>
             <fieldset>
+              <label htmlFor="country">
+                Country
+                <input
+                  {...register("country")}
+                  type="country"
+                  name="country"
+                  aria-label="Country"
+                  required
+                />
+              </label>
+            </fieldset>
+            <fieldset>
               <label htmlFor="description">
                 Description
                 <input

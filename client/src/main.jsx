@@ -6,6 +6,7 @@ import { createBrowserRouter, RouterProvider, Outlet } from "react-router-dom";
 import Layout from "./components/Layout/Layout";
 import App from "./components/App/App";
 import Auth from "./components/Auth/Auth";
+import Visits from "./components/Visits/Visits";
 import WorldMap from "./components/Map/Map";
 import "./index.css";
 import { queryClient } from "./util/queryClient";
@@ -26,7 +27,7 @@ const router = createBrowserRouter([
       },
       {
         path: "/visits",
-        element: <App />,
+        element: <Visits />,
       },
       {
         path: "/map",

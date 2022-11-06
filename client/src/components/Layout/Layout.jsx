@@ -11,7 +11,7 @@ const Header = ({ isLoggedIn }) => (
     <nav>
       <ul>
         <li>
-          <Link to="/Visited">
+          <Link to="/">
             <h1>Visited</h1>
           </Link>
         </li>

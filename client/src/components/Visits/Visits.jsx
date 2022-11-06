@@ -10,6 +10,11 @@ const getVisits = async () => {
   return result;
 };
 
+const getCountries = async () => {
+  const result = await client.records.getFullList("countries", 500);
+  return result;
+};
+
 const createVisit = async (visit) => {
   await client.records.create("visits", visit);
 };
@@ -21,6 +26,7 @@ function App() {
     formState: { errors },
   } = useForm();
   const visits = useQuery("visits", getVisits);
+  const countries = useQuery("countries", getCountries);
   const queryClient = useQueryClient();
   const { isLoading, mutate: mutateVisit } = useMutation(
     (data) => createVisit({ ...data, userId: client.authStore.model.id }),
@@ -74,13 +80,17 @@ function App() {
             <fieldset>
               <label htmlFor="country">
                 Country
-                <input
-                  {...register("country")}
-                  type="country"
+                <select
                   name="country"
                   aria-label="Country"
                   required
-                />
+                  {...register("country")}
+                >
+                  {countries.data &&
+                    countries.data.map((country) => (
+                      <option value={country.id}>{country.name}</option>
+                    ))}
+                </select>
               </label>
             </fieldset>
             <fieldset>

@@ -35,7 +35,7 @@ function Auth() {
       onSuccess: () => {
         queryClient.invalidateQueries(["visits"]);
         toast.success("logged in");
-        navigate("/visits");
+        navigate("/");
       },
       onError: (error) => {
         toast.error(error.message);

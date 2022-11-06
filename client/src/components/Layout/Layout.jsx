@@ -49,7 +49,6 @@ function Layout({ children }) {
   useEffect(() => {
     if (client.authStore.isValid) {
       setIsLoggedIn(true);
-      navigate("/");
     } else {
       setIsLoggedIn(false);
       navigate("/auth");

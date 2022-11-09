@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useQuery, useMutation, useQueryClient } from "react-query";
 import { client } from "../../util/client";
@@ -11,7 +12,9 @@ const getVisits = async () => {
 };
 
 const getCountries = async () => {
-  const result = await client.records.getFullList("countries", 500);
+  const result = await client.records.getFullList("countries", 500, {
+    sort: "name",
+  });
   return result;
 };
 
@@ -20,14 +23,19 @@ const createVisit = async (visit) => {
 };
 
 function App() {
+  const [countriesMap, setCountriesMap] = useState({});
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm();
-  const visits = useQuery("visits", getVisits);
-  const countries = useQuery("countries", getCountries);
+
   const queryClient = useQueryClient();
+
+  const visits = useQuery("visits", getVisits);
+
+  const countries = useQuery("countries", getCountries);
+
   const { isLoading, mutate: mutateVisit } = useMutation(
     (data) => createVisit({ ...data, userId: client.authStore.model.id }),
     {
@@ -41,9 +49,20 @@ function App() {
       },
     }
   );
+
   const onSubmit = async (data) => {
     mutateVisit(data);
   };
+
+  useEffect(() => {
+    if (Array.isArray(countries.data))
+      setCountriesMap(
+        countries.data.reduce((acc, country) => {
+          acc[country.id] = country.name;
+          return acc;
+        }, {})
+      );
+  }, [countries.data]);
 
   return (
     <>
@@ -88,7 +107,9 @@ function App() {
                 >
                   {countries.data &&
                     countries.data.map((country) => (
-                      <option value={country.id}>{country.name}</option>
+                      <option key={country.id} value={country.id}>
+                        {country.name}
+                      </option>
                     ))}
                 </select>
               </label>
@@ -125,6 +146,7 @@ function App() {
                     <th scope="col">#</th>
                     <th scope="col">Date</th>
                     <th scope="col">Title</th>
+                    <th scope="col">Country</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -133,6 +155,7 @@ function App() {
                       <th scope="row">{i + 1}</th>
                       <td>{visit.date}</td>
                       <td>{visit.title}</td>
+                      <td>{countriesMap[visit.country]}</td>
                     </tr>
                   ))}
                 </tbody>

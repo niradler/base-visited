@@ -1,0 +1,16 @@
+version: '3.8'
+services:
+  client:
+    build:
+      context: ./client
+    ports:
+      - "8480:80"
+  server:
+    build:
+      context: ./backend
+    volumes:
+      - ./visited:/pb
+    ports:
+      - "8481:8090"
+    environment:
+      NODE_ENV: production

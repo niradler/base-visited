@@ -1,6 +1,6 @@
 import { useQuery, useQueryClient } from "react-query";
 import { client } from "../../util/client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { toast } from "react-toastify";
 import {
   ComposableMap,
@@ -8,13 +8,18 @@ import {
   Geography,
   Marker,
 } from "react-simple-maps";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 const getVisits = async () => {
   const result = await client.records.getFullList("visits", 200, {
     expand: "country",
     sort: "-date",
   });
+  return result;
+};
+
+const getShare = async (query = {}) => {
+  const result = await client.records.getList("shares", 1, 200, query);
   return result;
 };
 
@@ -25,6 +30,11 @@ const subscribe = async (queryClient) => {
   });
 };
 
+function useQueryParams() {
+  const { search } = useLocation();
+
+  return useMemo(() => new URLSearchParams(search), [search]);
+}
 function SharedMap({ annotations = [], shared = false }) {
   const geoUrl =
     "https://raw.githubusercontent.com/deldersveld/topojson/master/world-countries.json";
@@ -57,36 +67,31 @@ function SharedMap({ annotations = [], shared = false }) {
 }
 function WorldMapPage() {
   const queryClient = useQueryClient();
-  const visits = useQuery("visits", getVisits);
   const [annotations, setAnnotations] = useState();
+  const [sharedKey, setSharedKey] = useState();
+  const query = useQueryParams();
+  const share = useQuery(["share", sharedKey], () =>
+    getShare({ key: sharedKey })
+  );
 
   useEffect(() => {
     subscribe(queryClient);
   }, [queryClient]);
 
   useEffect(() => {
-    if (visits.status === "error") toast.error("Error");
-    else if (Array.isArray(visits.data)) {
-      setAnnotations(
-        visits.data.map((visit) => {
-          const country = visit["@expand"].country;
-          return {
-            text: country?.name,
-            subject: [country?.longitude, country?.latitude],
-            id: visit.id,
-          };
-        })
-      );
+    const key = query.get("key");
+    if (key) {
+      setSharedKey(key);
     }
-  }, [visits.status]);
+  }, [query]);
+
+  useEffect(() => {
+    console.log(share);
+  }, [sharedKey, share]);
 
   return (
     <>
-      <div>
-        {visits.status === "error" && <p>Error fetching data</p>}
-        {visits.status === "loading" && <p>Fetching data...</p>}
-        {annotations && <SharedMap annotations={annotations} />}
-      </div>
+      <div></div>
     </>
   );
 }

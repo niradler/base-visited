@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useQuery, useMutation, useQueryClient } from "react-query";
+import { format } from "date-fns";
 import { client } from "../../util/client";
 import { toast } from "react-toastify";
 
@@ -153,7 +154,7 @@ function App() {
                   {visits.data.map((visit, i) => (
                     <tr key={visit.id}>
                       <th scope="row">{i + 1}</th>
-                      <td>{visit.date}</td>
+                      <td>{format(new Date(visit.date), "MM/dd/yyyy")}</td>
                       <td>{visit.title}</td>
                       <td>{countriesMap[visit.country]}</td>
                     </tr>
